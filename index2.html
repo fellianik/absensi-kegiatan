@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sistem Pendaftaran Kegiatan</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                backdrop-filter: blur(10px);
+            }
+
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .header p {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+
+            .content {
+                padding: 40px;
+            }
+
+            .section {
+                margin-bottom: 40px;
+                padding: 30px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                border: 1px solid rgba(102, 126, 234, 0.1);
+            }
+
+            .section h2 {
+                color: #4a5568;
+                margin-bottom: 20px;
+                font-size: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .icon {
+                width: 24px;
+                height: 24px;
+                fill: #667eea;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #4a5568;
+            }
+
+            input,
+            select {
+                width: 100%;
+                padding: 12px 16px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+            input:focus,
+            select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .btn {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 14px 28px;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+            .btn:disabled {
+                background: #cbd5e0;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+            .participants-list {
+                max-height: 300px;
+                overflow-y: auto;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                background: white;
+            }
+
+            .participant-item {
+                padding: 12px 16px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                transition: background-color 0.2s ease;
+            }
+
+            .participant-item:hover {
+                background-color: #f7fafc;
+            }
+
+            .participant-item:last-child {
+                border-bottom: none;
+            }
+
+            .participant-avatar {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .participant-info {
+                flex: 1;
+            }
+
+            .participant-name {
+                font-weight: 600;
+                color: #2d3748;
+                margin-bottom: 2px;
+            }
+
+            .participant-time {
+                font-size: 0.875rem;
+                color: #718096;
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 40px 20px;
+                color: #718096;
+            }
+
+            .empty-state svg {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 16px;
+                opacity: 0.5;
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .status-active {
+                background: #c6f6d5;
+                color: #22543d;
+            }
+
+            .status-inactive {
+                background: #fed7d7;
+                color: #742a2a;
+            }
+
+            .alert {
+                padding: 16px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                border-left: 4px solid;
+            }
+
+            .alert-success {
+                background: #f0fff4;
+                border-color: #38a169;
+                color: #22543d;
+            }
+
+            .alert-error {
+                background: #fff5f5;
+                border-color: #e53e3e;
+                color: #742a2a;
+            }
+
+            .alert-info {
+                background: #ebf8ff;
+                border-color: #3182ce;
+                color: #2a4365;
+            }
+
+            .refresh-btn {
+                background: transparent;
+                border: 2px solid #667eea;
+                color: #667eea;
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-size: 14px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .refresh-btn:hover {
+                background: #667eea;
+                color: white;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 20px;
+                color: #718096;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .spinner {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 2px solid #e2e8f0;
+                border-radius: 50%;
+                border-top-color: #667eea;
+                animation: spin 1s ease-in-out infinite;
+                margin-right: 8px;
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    margin: 0;
+                    border-radius: 0;
+                }
+
+                .header {
+                    padding: 20px;
+                }
+
+                .header h1 {
+                    font-size: 2rem;
+                }
+
+                .content {
+                    padding: 20px;
+                }
+
+                .section {
+                    padding: 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎯 Sistem Pendaftaran Kegiatan</h1>
+                <p>Daftar dan lihat peserta kegiatan yang sedang aktif</p>
+            </div>
+
+            <div class="content">
+                <!-- Registration Section -->
+                <div class="section">
+                    <h2>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+                        </svg>
+                        Pendaftaran Kegiatan
+                    </h2>
+                    <form id="registrationForm">
+                        <div class="form-group">
+                            <label for="participantName">Nama Lengkap:</label>
+                            <input type="text" id="participantName" required placeholder="Masukkan nama lengkap Anda" />
+                        </div>
+                        <div class="form-group">
+                            <label for="eventSelect">Pilih Kegiatan:</label>
+                            <select id="eventSelect" required>
+                                <option value="">-- Memuat kegiatan... --</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn" id="registerBtn">
+                            <span class="spinner" id="registerSpinner" style="display: none"></span>
+                            Daftar Sekarang
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Participants Section -->
+                <div class="section">
+                    <h2>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path
+                                d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.95L14 10l.94-2.07c.47-.58 1.21-.95 2.01-.95h1.54c.8 0 1.5.7 1.5 1.5V22h-1zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9.5c0-.28-.22-.5-.5-.5H5c-.28 0-.5.22-.5.5V15H6v7h1.5z"
+                            />
+                        </svg>
+                        Peserta Kegiatan Aktif
+                        <button class="refresh-btn" onclick="loadParticipants()" style="margin-left: auto">🔄 Refresh</button>
+                    </h2>
+                    <div id="participantsList">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Memuat data peserta...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // ==============================================
+            // KONFIGURASI - UBAH URL APPS SCRIPT DI SINI
+            // ==============================================
+            const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBi6AMInCdCNykHGnkr56bOPVkj6OpQ5iJoxQLXRoBMeucxqTWh0PiayO8BBJh1JXK/exec";
+            // ==============================================
+
+            let sheetsUrl = APPS_SCRIPT_URL;
+            let activeEvents = [];
+            let participants = [];
+
+            // JSONP helper function for GET requests to bypass CORS
+            function fetchWithJSONP(url) {
+                return new Promise((resolve, reject) => {
+                    const callbackName = "jsonp_callback_" + Math.round(100000 * Math.random());
+                    const script = document.createElement("script");
+
+                    // Add callback parameter to URL
+                    const separator = url.includes("?") ? "&" : "?";
+                    script.src = `${url}${separator}callback=${callbackName}`;
+
+                    // Create global callback function
+                    window[callbackName] = function (data) {
+                        resolve(data);
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                    };
+
+                    // Handle errors
+                    script.onerror = function () {
+                        reject(new Error("JSONP request failed"));
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                    };
+
+                    document.head.appendChild(script);
+                });
+            }
+
+            // Form submission helper using JSONP POST to bypass CORS
+            function submitFormData(url, data) {
+                return new Promise((resolve, reject) => {
+                    // Create a unique callback name
+                    const callbackName = "submitCallback_" + Math.round(100000 * Math.random());
+
+                    // Create form data as URL parameters
+                    const params = new URLSearchParams(data);
+                    params.append("callback", callbackName);
+
+                    // Create script tag for JSONP request
+                    const script = document.createElement("script");
+                    script.src = `${url}?${params.toString()}`;
+
+                    // Create global callback function
+                    window[callbackName] = function (response) {
+                        resolve(response);
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                    };
+
+                    // Handle errors
+                    script.onerror = function () {
+                        reject(new Error("Form submission failed"));
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                    };
+
+                    document.head.appendChild(script);
+
+                    // Fallback timeout
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            resolve({ success: true, message: "Registration completed" });
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                        }
+                    }, 5000);
+                });
+            }
+
+            // Connect to Google Sheets (background process)
+            async function connectSheets() {
+                try {
+                    await loadActiveEvents();
+                    await loadParticipants();
+                    console.log("✅ Successfully connected to Google Sheets");
+                } catch (error) {
+                    console.error("❌ Error connecting to sheets:", error);
+                    showAlert("Gagal memuat data. Silakan refresh halaman atau coba lagi nanti.", "error");
+                }
+            }
+
+            // Load active events from Google Sheets
+            async function loadActiveEvents() {
+                if (!sheetsUrl) return;
+
+                try {
+                    const response = await fetchWithJSONP(`${sheetsUrl}?action=getActiveEvents`);
+
+                    if (response.success) {
+                        activeEvents = response.events || [];
+                        updateEventSelect();
+                    } else {
+                        throw new Error(response.message || "Failed to load events");
+                    }
+                } catch (error) {
+                    console.error("Error loading active events:", error);
+                    showAlert("Gagal memuat daftar kegiatan aktif. Pastikan Apps Script sudah di-deploy dengan benar.", "error");
+                }
+            }
+
+            // Update event select options
+            function updateEventSelect() {
+                const select = document.getElementById("eventSelect");
+
+                if (activeEvents.length === 0) {
+                    select.innerHTML = '<option value="">-- Tidak ada kegiatan aktif --</option>';
+                    return;
+                }
+
+                select.innerHTML = '<option value="">-- Pilih Kegiatan --</option>';
+
+                activeEvents.forEach((event) => {
+                    const option = document.createElement("option");
+                    option.value = event.id;
+                    option.textContent = `${event.nama} (${event.tanggal})`;
+                    select.appendChild(option);
+                });
+            }
+
+            // Load participants for active events
+            async function loadParticipants() {
+                document.getElementById("participantsList").innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Memuat data peserta...
+                </div>
+            `;
+
+                try {
+                    const response = await fetchWithJSONP(`${sheetsUrl}?action=getParticipants`);
+
+                    if (response.success) {
+                        participants = response.participants || [];
+                        displayParticipants();
+                    } else {
+                        throw new Error(response.message || "Failed to load participants");
+                    }
+                } catch (error) {
+                    console.error("Error loading participants:", error);
+                    document.getElementById("participantsList").innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                        </svg>
+                        <p>Gagal memuat data peserta</p>
+                        <button class="refresh-btn" onclick="loadParticipants()" style="margin-top: 10px;">🔄 Coba Lagi</button>
+                    </div>
+                `;
+                }
+            }
+
+            // Display participants grouped by event
+            function displayParticipants() {
+                const container = document.getElementById("participantsList");
+
+                if (participants.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.95L14 10l.94-2.07c.47-.58 1.21-.95 2.01-.95h1.54c.8 0 1.5.7 1.5 1.5V22h-1z"/>
+                        </svg>
+                        <p>Belum ada peserta yang terdaftar</p>
+                    </div>
+                `;
+                    return;
+                }
+
+                // Group participants by event
+                const eventGroups = {};
+                participants.forEach((participant) => {
+                    if (!eventGroups[participant.eventId]) {
+                        eventGroups[participant.eventId] = [];
+                    }
+                    eventGroups[participant.eventId].push(participant);
+                });
+
+                let html = "";
+                Object.keys(eventGroups).forEach((eventId) => {
+                    const event = activeEvents.find((e) => e.id === eventId);
+                    const eventName = event ? event.nama : `Event ID: ${eventId}`;
+                    const eventDate = event ? event.tanggal : "";
+                    const eventParticipants = eventGroups[eventId];
+
+                    html += `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #4a5568; margin-bottom: 15px; padding: 10px; background: #f7fafc; border-radius: 8px; border-left: 4px solid #667eea;">
+                            ${eventName}
+                            ${eventDate ? `<span style="color: #718096; font-weight: normal; font-size: 0.9em;"> - ${eventDate}</span>` : ""}
+                            <span class="status-badge status-active">${eventParticipants.length} peserta</span>
+                        </h3>
+                        <div class="participants-list">
+                `;
+
+                    eventParticipants.forEach((participant) => {
+                        const initials = participant.nama
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .substring(0, 2);
+                        const timeFormatted = new Date(participant.waktu).toLocaleString("id-ID");
+
+                        html += `
+                        <div class="participant-item">
+                            <div class="participant-avatar">${initials}</div>
+                            <div class="participant-info">
+                                <div class="participant-name">${participant.nama}</div>
+                                <div class="participant-time">Terdaftar: ${timeFormatted}</div>
+                            </div>
+                        </div>
+                    `;
+                    });
+
+                    html += `
+                        </div>
+                    </div>
+                `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            // Handle registration form submission
+            document.getElementById("registrationForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const name = document.getElementById("participantName").value.trim();
+                const eventId = document.getElementById("eventSelect").value;
+
+                if (!name || !eventId) {
+                    showAlert("Harap isi semua field yang diperlukan.", "error");
+                    return;
+                }
+
+                const spinner = document.getElementById("registerSpinner");
+                const btn = document.getElementById("registerBtn");
+
+                spinner.style.display = "inline-block";
+                btn.disabled = true;
+
+                try {
+                    const response = await submitFormData(sheetsUrl, {
+                        action: "register",
+                        name: name,
+                        eventId: eventId,
+                    });
+
+                    if (response.success) {
+                        showAlert(`Berhasil mendaftar untuk kegiatan! Terima kasih ${name}.`, "success");
+                        document.getElementById("registrationForm").reset();
+                        await loadParticipants(); // Refresh participants list
+                    } else {
+                        throw new Error(response.message || "Registration failed");
+                    }
+                } catch (error) {
+                    console.error("Registration error:", error);
+                    showAlert("Gagal mendaftar. Periksa koneksi dan coba lagi.", "error");
+                } finally {
+                    spinner.style.display = "none";
+                    btn.disabled = false;
+                }
+            });
+
+            // Show alert messages
+            function showAlert(message, type) {
+                // Remove existing alerts
+                const existingAlerts = document.querySelectorAll(".alert");
+                existingAlerts.forEach((alert) => alert.remove());
+
+                const alert = document.createElement("div");
+                alert.className = `alert alert-${type}`;
+                alert.innerHTML = message;
+
+                const content = document.querySelector(".content");
+                content.insertBefore(alert, content.firstChild);
+
+                // Auto-hide success alerts after 5 seconds
+                if (type === "success") {
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 5000);
+                }
+            }
+
+            // Initialize the application
+            document.addEventListener("DOMContentLoaded", function () {
+                // Auto-load data on page load
+                if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec") {
+                    // Small delay to ensure UI is ready
+                    setTimeout(() => {
+                        connectSheets();
+                    }, 500);
+                } else {
+                    // Show error in console only, not to user
+                    console.error("⚠️ URL Apps Script belum dikonfigurasi. Silakan edit variabel APPS_SCRIPT_URL di bagian konfigurasi kode.");
+                    showAlert("Sistem sedang dalam mode pengembangan. Silakan hubungi administrator.", "error");
+                }
+            });
+        </script>
+    </body>
+</html>

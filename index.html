@@ -581,6 +581,7 @@
 
                         // Status pembayaran/lunas
                         let statusHtml = "";
+                        console.log(participant.lunas);
                         if (participant.lunas === true || participant.lunas === "TRUE" || participant.lunas === "true") {
                             statusHtml = '<span class="status-badge status-paid">✅</span>';
                         } else {
@@ -692,3 +693,4 @@
         </script>
     </body>
 </html>
+
